@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>T20 Effective NRR Calculator</title>
+    <link rel="icon" href="https://images.seeklogo.com/logo-png/63/1/2026-icc-mens-t20-world-cup-logo-png_seeklogo-630033.png" sizes="32x32" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="bg-gray-50 text-gray-900 min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6">
+      <header class="mb-4 bg-white/60 backdrop-blur-sm rounded-lg p-3 flex items-center gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-indigo-100 to-pink-50 rounded-full shadow-sm overflow-hidden">
+            <img src="https://images.seeklogo.com/logo-png/63/1/2026-icc-mens-t20-world-cup-logo-png_seeklogo-630033.png" alt="T20 World Cup 2026 logo" class="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-semibold">T20 World Cup 2026 Effective NRR Calculator</h1>
+            <p class="text-sm text-gray-600">T20 all-out = full 20 overs (config set to enabled)</p>
+          </div>
+        </div>
+      </header>
+
+      <form id="nrr-form" class="space-y-6">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Candidate team</label>
+            <div class="mt-1 flex items-center gap-3">
+              <select id="candidate-team" class="block w-full rounded-md border-gray-300 shadow-sm">
+              </select>
+              <img id="candidate-flag" src="" alt="" class="w-8 h-6 object-contain rounded-sm shadow-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Opponent team</label>
+            <div class="mt-1 flex items-center gap-3">
+              <select id="opponent-team" class="block w-full rounded-md border-gray-300 shadow-sm">
+              </select>
+              <img id="opponent-flag" src="" alt="" class="w-8 h-6 object-contain rounded-sm shadow-sm" />
+            </div>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Candidate batted first?</label>
+            <div class="mt-1 flex gap-4 items-center">
+              <!-- Toggle buttons for "batted first" -->
+              <div id="batted-first-group" class="inline-flex rounded-md shadow-sm" role="group" aria-label="Candidate batted first">
+                <button type="button" id="batted-yes" data-value="yes" class="px-3 py-1 bg-indigo-600 text-white rounded-l">Yes</button>
+                <button type="button" id="batted-no" data-value="no" class="px-3 py-1 bg-white text-gray-700 border rounded-r">No</button>
+              </div>
+              <input type="hidden" name="batted-first" id="batted-first" value="yes">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">T20 all-out = full 20 overs</label>
+            <div class="mt-1 text-sm text-gray-600">Enabled</div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Current tournament NRR (before match)</label>
+            <div class="mt-1">
+              <input id="current-nrr" type="number" step="0.001" class="w-full rounded border-gray-300 p-2" placeholder="e.g. 0.123" />
+              <p class="text-xs text-gray-500 mt-1">Enter current tournament NRR if you don't want to provide cumulative totals.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <fieldset class="p-4 border rounded">
+            <legend class="font-medium">Candidate innings</legend>
+            <div class="mt-2 grid grid-cols-1 gap-2">
+              <label class="text-sm font-medium">Runs</label>
+              <input id="cand-runs" type="number" min="0" value="0" class="w-full rounded border-gray-300 p-2" />
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-sm">Overs</label>
+                  <input id="cand-overs" type="number" min="0" value="20" class="w-full rounded border-gray-300 p-2" />
+                </div>
+                <div>
+                  <label class="text-sm">Balls</label>
+                  <input id="cand-balls" type="number" min="0" max="5" value="0" class="w-full rounded border-gray-300 p-2" />
+                </div>
+                <div>
+                  <label class="text-sm">Wickets</label>
+                  <input id="cand-wkts" type="number" min="0" max="10" value="0" class="w-full rounded border-gray-300 p-2" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="p-4 border rounded">
+            <legend class="font-medium">Opponent innings</legend>
+            <div class="mt-2 grid grid-cols-1 gap-2">
+              <label class="text-sm font-medium">Runs</label>
+              <input id="opp-runs" type="number" min="0" value="0" class="w-full rounded border-gray-300 p-2" />
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-sm">Overs</label>
+                  <input id="opp-overs" type="number" min="0" value="20" class="w-full rounded border-gray-300 p-2" />
+                </div>
+                <div>
+                  <label class="text-sm">Balls</label>
+                  <input id="opp-balls" type="number" min="0" max="5" value="0" class="w-full rounded border-gray-300 p-2" />
+                </div>
+                <div>
+                  <label class="text-sm">Wickets</label>
+                  <input id="opp-wkts" type="number" min="0" max="10" value="0" class="w-full rounded border-gray-300 p-2" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </section>
+
+        <div class="flex items-center gap-3">
+          <button id="calc" type="button" class="px-4 py-2 bg-indigo-600 text-white rounded">Calculate</button>
+          <button id="reset" type="button" class="px-4 py-2 border rounded">Reset</button>
+          <div id="status" class="text-sm text-gray-600"></div>
+        </div>
+
+        <section id="results" class="mt-4 hidden p-4 border rounded bg-gray-50">
+          <h3 class="font-medium">Results</h3>
+          <div class="mt-2 space-y-2">
+            <div id="match-nrr" class="text-sm"></div>
+            <div id="new-tournament-nrr" class="text-sm"></div>
+            <div id="delta-nrr" class="text-sm"></div>
+            <div class="flex items-center gap-2">
+              <div id="winner" class="text-sm font-semibold mt-2"></div>
+              <img id="winner-flag" src="" alt="" class="w-6 h-4 object-contain rounded-sm shadow-sm hidden" />
+            </div>
+          </div>
+        </section>
+      </form>
+
+      <footer class="mt-6 text-xs text-gray-500">Note: Overs input can be split as overs and balls (balls from 0-5). When a team is all out (10 wickets) the overs faced are treated as full 20 overs.</footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
