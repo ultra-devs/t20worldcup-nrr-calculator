@@ -63,6 +63,13 @@ function oversToFloat(overs, balls, allOut){
 }
 
 function formatNum(n){ return Number(n).toFixed(3); }
+function formatSigned(n){
+  const num = Number(n);
+  if (Number.isNaN(num)) return '0.000';
+  if (num > 0) return `+${num.toFixed(3)}`;
+  if (num < 0) return `${num.toFixed(3)}`; // negative already has '-'
+  return '0.000';
+}
 
 function calculateMatchNRR(){
   const candRuns = Number($('cand-runs').value) || 0;
@@ -114,7 +121,10 @@ function showResults(){
   const deltaEl = $('delta-nrr');
   const winnerEl = $('winner');
 
-  matchNrrEl.textContent = `Match NRR (candidate): ${formatNum(r.matchNRR)}  —  (${formatNum(r.runRateFor)} - ${formatNum(r.runRateAgainst)})`;
+  matchNrrEl.textContent = `Match NRR (candidate): ${formatSigned(r.matchNRR)}  —  (${formatNum(r.runRateFor)} - ${formatNum(r.runRateAgainst)})`;
+  // color the match NRR text green for positive, red for negative
+  matchNrrEl.classList.remove('text-green-700','text-red-600');
+  if(r.matchNRR > 0){ matchNrrEl.classList.add('text-green-700'); } else if(r.matchNRR < 0){ matchNrrEl.classList.add('text-red-600'); }
 
   // determine winner based on runs
   let winnerText = '';
@@ -127,11 +137,16 @@ function showResults(){
       deltaEl.innerHTML = `<span class="text-gray-500">Delta:</span> <span class="font-semibold">N/A</span>`;
     } else {
       if(tourn.approximate){
-        newTournEl.innerHTML = `<span class="text-gray-700">Tournament NRR BEFORE:</span> <span class="font-semibold">${formatNum(tourn.beforeNRR)}</span> <span class="text-gray-500">AFTER (estimate):</span> <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded">${formatNum(tourn.afterNRR)}</span>`;
-        deltaEl.innerHTML = `<span class="text-gray-500">Delta (estimate):</span> <span class="font-semibold">${formatNum(tourn.afterNRR - tourn.beforeNRR)}</span>`;
+        // Use signed display for before/after and highlight the estimate
+        const afterSign = tourn.afterNRR > 0 ? 'text-green-800 bg-green-100' : (tourn.afterNRR < 0 ? 'text-red-600 bg-red-100' : 'text-gray-800 bg-gray-100');
+        newTournEl.innerHTML = `<span class="text-gray-700">Tournament NRR BEFORE:</span> <span class="font-semibold">${formatSigned(tourn.beforeNRR)}</span> <span class="text-gray-500">AFTER (estimate):</span> <span class="ml-2 px-2 py-1 rounded ${afterSign}">${formatSigned(tourn.afterNRR)}</span>`;
+        const deltaEstimate = tourn.afterNRR - tourn.beforeNRR;
+        deltaEl.innerHTML = `<span class="text-gray-500">Delta (estimate):</span> <span class="font-semibold">${formatSigned(deltaEstimate)}</span>`;
       } else {
-        newTournEl.innerHTML = `<span class="text-gray-700">Tournament NRR BEFORE:</span> <span class="font-semibold">${formatNum(tourn.beforeNRR)}</span> <span class="text-gray-500">AFTER:</span> <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded">${formatNum(tourn.afterNRR)}</span>`;
-        deltaEl.innerHTML = `<span class="text-gray-500">Delta:</span> <span class="font-semibold">${formatNum(tourn.afterNRR - tourn.beforeNRR)}</span>`;
+        const deltaVal = tourn.afterNRR - tourn.beforeNRR;
+        const afterSign = tourn.afterNRR > 0 ? 'text-green-800 bg-green-100' : (tourn.afterNRR < 0 ? 'text-red-600 bg-red-100' : 'text-gray-800 bg-gray-100');
+        newTournEl.innerHTML = `<span class="text-gray-700">Tournament NRR BEFORE:</span> <span class="font-semibold">${formatSigned(tourn.beforeNRR)}</span> <span class="text-gray-500">AFTER:</span> <span class="ml-2 px-2 py-1 rounded ${afterSign}">${formatSigned(tourn.afterNRR)}</span>`;
+        deltaEl.innerHTML = `<span class="text-gray-500">Delta:</span> <span class="font-semibold">${formatSigned(deltaVal)}</span>`;
       }
     }
   } else {
