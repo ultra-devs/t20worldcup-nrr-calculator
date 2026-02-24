@@ -177,6 +177,15 @@ function init(){
   $('calc').addEventListener('click', ()=>{ showResults(); });
   $('reset').addEventListener('click', ()=>{ resetForm(); });
 
+  // Help panel toggle
+  const helpBtn = $('help-btn');
+  const helpPanel = $('help-panel');
+  const helpClose = $('help-close');
+  if(helpBtn && helpPanel){
+    helpBtn.addEventListener('click', ()=> helpPanel.classList.remove('hidden'));
+    if(helpClose) helpClose.addEventListener('click', ()=> helpPanel.classList.add('hidden'));
+  }
+
   // Update fieldset legends when user selects whether candidate batted first
   function updateInningsLabels(){
     const val = document.getElementById('batted-first')?.value || 'yes';
