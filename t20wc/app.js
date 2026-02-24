@@ -236,28 +236,37 @@ function init(){
 
 init();
 
-// CountAPI visitor counter (increments on each page load)
+// Fetch visitor count from user-provided POST API and update UI; show 'N/A' on failure
 (function(){
   const visitorEl = document.getElementById('visitor-count');
   const badgeEl = document.getElementById('viewer-count');
   if(!visitorEl && !badgeEl) return;
-  const namespace = 'coderhop-t20wc';
-  const key = 'home';
-  // First, get current value (so badge shows existing count without increment for header)
-  fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
-    .then(r=> r.json())
-    .then(data=>{
-      if(data && typeof data.value !== 'undefined'){
-        if(visitorEl) visitorEl.textContent = data.value;
-        if(badgeEl) badgeEl.textContent = data.value;
-      }
-    })
-    .catch(()=>{
+
+  const url = 'https://trackbacks-suffering-min-catch.trycloudflare.com/counter';
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+    mode: 'cors'
+  })
+  .then(res => {
+    if(!res.ok) throw new Error(`Counter API returned ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if(data && typeof data.count === 'number'){
+      const v = data.count;
+      if(visitorEl) visitorEl.textContent = v;
+      if(badgeEl) badgeEl.textContent = v;
+    } else {
       if(visitorEl) visitorEl.textContent = 'N/A';
-      if(badgeEl) badgeEl.textContent = '0';
-    })
-    .finally(()=>{
-      // then increment (hit) so next visitor sees increased count
-      fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`).catch(()=>{});
-    });
+      if(badgeEl) badgeEl.textContent = 'N/A';
+    }
+  })
+  .catch(err => {
+    console.warn('Counter API failed:', err);
+    if(visitorEl) visitorEl.textContent = 'N/A';
+    if(badgeEl) badgeEl.textContent = 'N/A';
+  });
 })();
