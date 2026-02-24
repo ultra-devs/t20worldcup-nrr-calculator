@@ -235,3 +235,29 @@ function init(){
 }
 
 init();
+
+// CountAPI visitor counter (increments on each page load)
+(function(){
+  const visitorEl = document.getElementById('visitor-count');
+  const badgeEl = document.getElementById('viewer-count');
+  if(!visitorEl && !badgeEl) return;
+  const namespace = 'coderhop-t20wc';
+  const key = 'home';
+  // First, get current value (so badge shows existing count without increment for header)
+  fetch(`https://api.countapi.xyz/get/${namespace}/${key}`)
+    .then(r=> r.json())
+    .then(data=>{
+      if(data && typeof data.value !== 'undefined'){
+        if(visitorEl) visitorEl.textContent = data.value;
+        if(badgeEl) badgeEl.textContent = data.value;
+      }
+    })
+    .catch(()=>{
+      if(visitorEl) visitorEl.textContent = 'N/A';
+      if(badgeEl) badgeEl.textContent = '0';
+    })
+    .finally(()=>{
+      // then increment (hit) so next visitor sees increased count
+      fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`).catch(()=>{});
+    });
+})();
