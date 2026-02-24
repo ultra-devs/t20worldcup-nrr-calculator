@@ -42,6 +42,9 @@ function populateTeams(){
   cand.addEventListener('change', ()=>{
     const sel = teams.find(t=> t.name === cand.value);
     if(sel && candFlag) candFlag.src = sel.flag;
+    // update current NRR label to include team name
+    const label = document.getElementById('current-nrr-label');
+    if(label) label.textContent = `${cand.value} current NRR (before match)`;
   });
   opp.addEventListener('change', ()=>{
     const sel = teams.find(t=> t.name === opp.value);
@@ -140,9 +143,11 @@ function showResults(){
   if(winnerEl){
     winnerEl.textContent = winnerText;
     const winnerFlagEl = $('winner-flag');
+    const trophyEl = $('winner-trophy');
     if(winnerText.includes('won')){
       winnerEl.classList.add('text-green-700');
       winnerEl.classList.remove('text-gray-700');
+      if(trophyEl) trophyEl.classList.remove('hidden');
       // set flag for winner
       const winnerName = winnerText.replace(' won','');
       const winnerTeam = teams.find(t=> t.name === winnerName);
@@ -150,6 +155,7 @@ function showResults(){
     } else {
       winnerEl.classList.remove('text-green-700');
       if(winnerFlagEl) winnerFlagEl.classList.add('hidden');
+      if(trophyEl) trophyEl.classList.add('hidden');
     }
   }
 
@@ -176,15 +182,6 @@ function init(){
   populateTeams();
   $('calc').addEventListener('click', ()=>{ showResults(); });
   $('reset').addEventListener('click', ()=>{ resetForm(); });
-
-  // Help panel toggle
-  const helpBtn = $('help-btn');
-  const helpPanel = $('help-panel');
-  const helpClose = $('help-close');
-  if(helpBtn && helpPanel){
-    helpBtn.addEventListener('click', ()=> helpPanel.classList.remove('hidden'));
-    if(helpClose) helpClose.addEventListener('click', ()=> helpPanel.classList.add('hidden'));
-  }
 
   // Update fieldset legends when user selects whether candidate batted first
   function updateInningsLabels(){
