@@ -238,6 +238,7 @@ init();
 
 // Fetch visitor count from user-provided POST API and update UI; show 'N/A' on failure
 (function(){
+  console.log('Fetching visitor count...');
   const visitorEl = document.getElementById('visitor-count');
   const badgeEl = document.getElementById('viewer-count');
   if(!visitorEl && !badgeEl) return;
@@ -245,9 +246,8 @@ init();
   const url = 'https://trackbacks-suffering-min-catch.trycloudflare.com/counter';
 
   fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({}),
     mode: 'cors'
   })
   .then(res => {
